@@ -1,0 +1,65 @@
+package ch.sowatec.test;
+
+import app.model.Game;
+import app.model.Guess;
+
+function int getInput() {
+	return Game.getInput();
+}
+ 
+rule "init"
+	when
+		not Game()
+		not Guess()
+    then
+        System.out.println("Rule init");
+end
+
+rule "start"
+	when
+		game : Game();
+		not Guess();
+	then
+		System.out.println("Game");
+		modify(game) { count = game.count + 1 }
+		insert(new Guess(getInput()));
+end
+
+rule "lesser"
+	when
+		game : Game(count <= maxCount)
+		guess : Guess(num < game.number);
+	then
+		System.out.println("Guessed too low " + game.count);
+		modify(game) { count = game.count + 1 }
+		retract(guess)
+		insert(new Guess(getInput()));
+end
+
+rule "greater"
+	when
+		game : Game(count <= maxCount)
+		guess : Guess(num > game.number);
+	then
+		System.out.println("Guessed too high " + game.count);
+		modify(game) { count = game.count + 1 }
+		retract(guess)
+		insert(new Guess(getInput()));
+end
+
+rule "found"
+	when
+		game: Game(count <= maxCount)
+		guess: Guess(num == game.number)
+	then
+		System.out.println("Found");
+		retract(game);
+end
+
+rule "end"
+	when
+		 game: Game(count > maxCount);
+	then 
+		System.out.println("You lost");
+end
+

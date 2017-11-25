@@ -1,20 +1,10 @@
 package app.model;
 
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
+@Data
+@RequiredArgsConstructor
 public class Guess {
-	
-	public Guess(int num) {
-		this.num = num;
-	}
-	
-	public int num;
-
-	public int getNum() {
-		return num;
-	}
-
-	public void setNum(int num) {
-		this.num = num;
-	}
-	
-	
+	final int num;
 }

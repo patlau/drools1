@@ -5,12 +5,25 @@
  * For more details take a look at the Java Libraries chapter in the Gradle
  * user guide available at https://docs.gradle.org/3.5/userguide/java_library_plugin.html
  */
+
+buildscript {
+    repositories.jcenter()
+    dependencies {
+        classpath("org.springframework:springloaded:1.2.8.RELEASE")
+    }
+}
  
 plugins {
 	id 'java'
  	id 'net.ltgt.errorprone' version "0.0.13"
  	id 'eclipse'
  	id 'java-library'
+ 	id 'org.springframework.boot' version '1.5.8.RELEASE'
+ 	id 'groovy'
+}
+
+ext {
+	vaadinVersion = '1.0.0.alpha11'
 }
 
 sourceCompatibility = 1.8
@@ -18,19 +31,42 @@ targetCompatibility = 1.8
 
 // In this section you declare where to find the dependencies of your project
 repositories {
-    // Use jcenter for resolving your dependencies.
-    // You can declare any Maven/Ivy/file repository here.
-    // jcenter()
     mavenCentral()
+    maven { url 'https://repo.vaadin.com/nexus/content/repositories/flow' }
+    maven { url 'https://maven.vaadin.com/vaadin-addons' }
+    //jcenter()
 }
 
+//	compile group: 'org.springframework', name: 'spring-core', version: '4.3.3.RELEASE'
+// 	compile 'org.slf4j:slf4j-jdk14:1.7.25'
+
 dependencies {
+
 	testCompile group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.0.1'
-	compile group: 'org.springframework', name: 'spring-core', version: '4.3.3.RELEASE'
-	compile group: 'org.kie', name: 'kie-spring', version: '7.4.1.Final'
-	compile 'org.slf4j:slf4j-jdk14:1.7.25'
+	
+	compile 'org.kie:kie-spring:7.4.1.Final'
 	compileOnly 'org.projectlombok:lombok:1.16.18'
-	errorprone 'com.google.errorprone:error_prone_core:2.0.21'
+	errorprone 'com.google.errorprone:error_prone_core:2.1.1'
+
+    compile "org.codehaus.groovy:groovy-all:2.4.13"
+    compile "org.springframework.boot:spring-boot-starter-web"
+    compile "com.vaadin:flow:${vaadinVersion}"
+    compile "com.vaadin:flow-components:1.0.0.alpha11"
+    compile "com.vaadin:flow-spring-addon:${vaadinVersion}"
+ 
+     // XXX: explicit overrides for some of the "odd" transient deps from some of the bower webjars   
+	compile 'org.webjars.bower:webcomponentsjs:1.0.14'
+    compile 'org.webjars.bower:github-com-polymer-polymer:v2.1.1'
+    compile 'org.webjars.bower:github-com-webcomponents-shadycss:v1.0.6'
+    compile 'org.webjars.bower:github-com-webcomponents-webcomponentsjs:v1.0.8'
+    compile 'org.webjars.bower:github-com-vaadin-vaadin-control-state-mixin:v1.1.4'
+	compile 'org.webjars.bower:iron-a11y-keys-behavior:2.0.1'
+	compile 'org.webjars.bower:iron-a11y-announcer:2.0.0'
+	compile 'org.webjars.bower:github-com-polymerelements-iron-resizable-behavior:2.0.1'
+	compile 'org.webjars.bower:github-com-polymerelements-iron-scroll-target-behavior:2.0.0'
+	compile 'org.webjars.bower:vaadin-grid:4.1.0-alpha1'
+	compile 'org.webjars.bower:polymer:2.1.1'	
+	
 }
 
 eclipse {
@@ -44,7 +80,6 @@ eclipse {
   }
 }
 
-
-
-
-
+tasks.withType(JavaCompile) {
+  options.compilerArgs += [ '-Xep:NestedInstanceOfConditions:OFF', '-Xep:InstanceOfAndCastMatchWrongType:OFF']
+}
